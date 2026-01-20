@@ -2,7 +2,7 @@ package znet
 
 import (
 	"fmt"
-
+	"net"
 	"zinxDemo/ziface"
 )
 
@@ -20,7 +20,54 @@ type Server struct {
 
 // 启动服务器
 func (s *Server) Start() {
-	fmt.Println()
+	fmt.Printf("[Start] Server Listener at IP :%s, Port: %d, is starting\n", s.IP, s.Port)
+
+	go func() {
+		// 1 获取一个TCP的Addr
+		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		// 2 监听服务器的地址
+		listener, err := net.ListenTCP(s.IPVersion, addr)
+		if err != nil {
+			fmt.Println("listen", s.IPVersion, "err:", err)
+			return
+		}
+		fmt.Println("start Zinx server successful,", s.Name, " succ, Listenning...")
+
+		// 3 阻塞的等待客户端链接,处理客户端链接业务(读写)
+		for {
+			//如果有客户端链接过来,阻塞会返回
+			conn, err := listener.AcceptTCP()
+			if err != nil {
+				fmt.Println("Accept err", err)
+				continue
+			}
+
+			//已经与客户端建立连接,做一些业务,做一个最基本的最大512字节长度的回显业务
+			go func() {
+				for {
+					buf := make([]byte, 512)
+					cnt, err := conn.Read(buf) //接收数据到buf
+					if err != nil {
+						fmt.Println("recv buf err")
+						continue
+					}
+
+					//回显功能
+					if _, err := conn.Write(buf[:cnt]); err != nil { //发送数据到buf
+						fmt.Println("write back buf err", err)
+						continue
+					}
+
+				}
+			}()
+		}
+	}()
+
 }
 
 // 停止服务器
@@ -30,7 +77,7 @@ func (s *Server) Stop() {
 
 // 运行服务器
 func (s *Server) Serve() {
-
+	s.Start()
 }
 
 /*
