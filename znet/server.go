@@ -77,7 +77,11 @@ func (s *Server) Stop() {
 
 // 运行服务器
 func (s *Server) Serve() {
+	//启动服务器
 	s.Start()
+
+	//阻塞状态
+	select {}
 }
 
 /*
