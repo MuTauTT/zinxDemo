@@ -72,6 +72,7 @@ func (s *Server) Start() {
 
 // 停止服务器
 func (s *Server) Stop() {
+	//TODO 将一些服务器的资源,状态或者一些开辟的链接信息 进行停止或者回收
 
 }
 
@@ -79,7 +80,7 @@ func (s *Server) Stop() {
 func (s *Server) Serve() {
 	//启动服务器
 	s.Start()
-
+	//TODO 做一些启动服务器之后的额外业务
 	//阻塞状态
 	select {}
 }
